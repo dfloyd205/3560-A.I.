@@ -29,23 +29,25 @@ yd = []
 class neuron:
     def __init__(self, dSize, inputData):
         self.dSize = dSize
-        #self.weights = [random() for i in range(self.dSize)]
         self.weights = []
+        #self.weights = []
         self.theta = random()
         
-
-    def calcWeights(self):
+    def initWeights(self):
         for i in range(self.dSize):
-            self.weights[i].append(random())
-        return self.weights
+            self.weights.append(random())
+
+    def returnWeight(self, weight_num):
+        w = weight_num
+        return self.weights[w]
 
     def feedForward(self, inputData):
         dataRow = inputData
         guess = 0
         aggregation = 0
         data = dataRow[:self.dSize]
+        
         for x in range(len(data)):
-            
             point = data[x]
             wx = self.weights[x]
             aggregation += wx * float(point)
@@ -54,11 +56,16 @@ class neuron:
         
         return guess
     
-    def updateWeights(self, delta):
-        self.delta = delta
+    def updateOWeights(self, D):
+        delta = D
         for w in range(len(self.weights)):
             weight = self.weights[w]
-            #weight = (weight + 'y1'alpha * delta)
+            weight = weight + alpha * (y[w-3]) * delta
+        self.theta = self.theta + alpha * -1 * delta
+
+    def updateHWeights(self, D):
+        for w in rage(len(self.weights)):
+            
 
 
 
@@ -70,8 +77,9 @@ class layer:
         self.sSize = sSize
         self.inputData = inputData
         self.n = []
-        self.delta = []
-        self.nWeights = []
+        self.oDelta = []
+        self.hDelta = []
+        self.prevWeights = []
 
     def appendYd(self):
         actual = self.inputData[self.sSize:]
@@ -81,17 +89,11 @@ class layer:
     def createNeurons(self):
         for x in range(self.lSize):
             self.n.append(neuron(self.sSize, self.inputData))
+        for x in range(self.lSize):
+            self.n[x].initWeights()
 
-    def grabWeights(self):
-        for wSet in self.n:
-            self.nWeights.append(self.n[wSet].calcWeights())
-        print(self.nWeights)
-            
-
-
-    def passSample(self):
+    def forward(self):
         for j in range(self.lSize):
-            #y.clear()
             y.append(self.n[j].feedForward(self.inputData))
 
     def calcOdeltas(self):
@@ -101,18 +103,30 @@ class layer:
         yOut = self.n[:self.lSize]
         
         for i in range(len(yOut)):
-            newDelta = (y[i] * (1-y[i]) * yd[i])
-            self.delta.append(newDelta)
+            newODelta = (y[i] * (1-y[i]) * (yd[i]-y[i]))
+            self.oDelta.append(newODelta)
         
-        for w in range(len(self.delta)):
-            self.n[i].updateWeights(self.delta[w])
+        for d in range(len(self.oDelta)):
+            self.n[d].updateOWeights(self.oDelta[d])
     
     def calcHdeltas(self):
         yHidden = self.n[self.lSize:]
+        
+        for i in range(len(yHidden)):
+            newHDelta = (y[i] * (1 - y[i]) * ((self.oDelta[i]*self.n[1].weights[i]) + (self.oDelta[i+1]*self.n[2].weights[i]) + (self.oDelta[i+2]*self.n[3].weights[i])))
+            self.hDelta.append(newHDelta)
 
-        #for i in range(yHidden):
-            #delta.append:(y[i]*)
+        for d in range(len(self.hDelta)):
+            self.n[d].updateHWeights(self.hDelta[d])
 
+
+# TO DO:
+#
+#       figure out why each neuron initializes too many weights ---DONE
+#
+#       pass each layer's neurons and thier weights into something global
+#       in order to be able to pass values between layers
+#       currently, each layer's neurons are unable to pass data back and forth.
 
 
 
@@ -124,20 +138,22 @@ for epoch in range(1):
 
         #hidden layer definition
         hidden = layer(3, 4, sample)    
-        hidden.grabWeights()
         hidden.createNeurons()
-        hidden.passSample()
+        
+        hidden.forward()
         hidden.appendYd()
 
         #output layer definition
         output = layer(3, 3, y)
         output.createNeurons()
-        output.grabWeights()
-        output.passSample()
+        output.forward()
 
         output.calcOdeltas()
         hidden.calcHdeltas()
 
-        hidden.grabWeights()
-        
         #clear out y and yd after operating on each sample row in the data
+        #print(hidden.delta)
+        #print(". . . . . . . . . . .")
+        #print(output.delta)
+    #print(hidden.n[1].weights)
+    
