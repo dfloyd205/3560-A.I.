@@ -129,13 +129,13 @@ class layer:
 
 # TO DO:
 #
-#       figure out why each neuron initializes too many weights ---DONE
+#       figure out why each neuron initializes too many weights --DONE
 #
 #       pass each layer's neurons and thier weights into something global
 #       in order to be able to pass values between layers
 #       currently, each layer's neurons are unable to pass data back and forth. -- ALTERNATIVE SOL. FOUND
 #
-#       figure out why MAD won't get smaller
+#       figure out why MAD won't get smaller --Done
 
 
 
