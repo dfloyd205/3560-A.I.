@@ -2,6 +2,8 @@ import csv
 from random import random
 from random import seed
 import math
+from datetime import datetime
+import numpy as np
 # file to be imported
 file = 'iris.csv'
 
@@ -19,12 +21,6 @@ with open(file, newline='') as csvfile:
         data.append(row)
 
 
-seed(1) # seed rand # generator
-#w = [random() for i in range(4)]
-#theta = 0
-alpha = 0.1
-y = []
-yd = []
 
 class neuron:
     def __init__(self, dSize):
@@ -43,16 +39,20 @@ class neuron:
 
     def feedForward(self, inputData):
         dataRow = inputData
-        guess = 0
-        aggregation = 0
+        guess = 0.0
+        aggregation = 0.0
         data = dataRow[:self.dSize]
         
         for x in range(len(data)):
             point = data[x]
             wx = self.weights[x]
             aggregation += wx * float(point)
-            aggregation = aggregation - self.theta
-            guess = (1/(1+math.exp(-aggregation)))
+            
+        aggregation -= self.theta
+        if aggregation < 0:
+            guess = 1 - 1/(1 + math.exp(aggregation))
+        else:
+            guess = 1/ (1 + math.exp(-aggregation))
         
         return guess
     
@@ -140,6 +140,11 @@ class layer:
 
 
 #main body
+seed(1) # seed rand # generator
+alpha = 0.1
+y = []
+yd = []
+
 
 #hidden layer definition
 hidden = layer(3, 4)    
@@ -148,7 +153,7 @@ hidden.createNeurons()
 output = layer(3, 3)
 output.createNeurons()
 
-for epoch in range(100):
+for epoch in range(200):
     e = 0
     count = 0
     
@@ -178,7 +183,7 @@ for epoch in range(100):
         y.clear()
     
     #calc MAD
-    mad = (1/count) * e
+    mad = (e/count)
 
     print("Epoch " + str(epoch) + " " + "MAD: " + str(mad))
     
