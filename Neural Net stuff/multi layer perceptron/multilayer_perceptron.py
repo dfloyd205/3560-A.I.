@@ -180,5 +180,5 @@ for epoch in range(100):
     #calc MAD
     mad = (1/count) * e
 
-    print("MAD: " + str(mad))
+    print("Epoch " + str(epoch) + " " + "MAD: " + str(mad))
     
